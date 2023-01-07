@@ -1,0 +1,38 @@
+name: CI - Build web and test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - src/**
+      - .github/workflows/CI - Build web and test.yml
+
+concurrency:
+  group: ${{ github.head_ref }}-build-and-test
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build dotnet solution
+        run: dotnet build -c Release --no-restore
+
+      - name: Unit test dotnet API
+        run: dotnet test -c Release --no-build --verbosity normal
+
+
+        
