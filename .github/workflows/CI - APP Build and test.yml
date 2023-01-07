@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - src/**
-      - .github/workflows/CI - Build web and test.yml
+      - .github/workflows/CI - APP Build and test.yml
 
 concurrency:
   group: ${{ github.head_ref }}-build-and-test
@@ -31,7 +31,7 @@ jobs:
       - name: Build dotnet solution
         run: dotnet build -c Release --no-restore
 
-      - name: Unit test dotnet API
+      - name: Unit test dotnet web
         run: dotnet test -c Release --no-build --verbosity normal
 
 
