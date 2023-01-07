@@ -1,0 +1,54 @@
+name: Terraform infrastructure plan
+
+on:
+  workflow_call:
+    inputs:
+      terraform-directory:
+        description: "The directory that the terraform should be initialized from"
+        required: true
+        type: string
+      azure-terraform-storage-account:
+        description: "The storage account used to hold the terraform state"
+        required: true
+        type: string
+    secrets:
+      azure-tenant-id:
+        description: "The tenant id in Azure"
+        required: true
+      azure-subscription-id:
+        description: "The subscription id in Azure"
+        required: true
+      azure-service-principal-id:
+        description: "The service-principal id"
+        required: true
+      azure-service-principal-secret:
+        description: "The service-principal secret"
+        required: true
+
+jobs:
+  restart-api:
+    runs-on: ubuntu-latest
+    name: Plan infrastructure
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init --backend-config="storage_account_name=$azure_terraform_storage_account"
+        working-directory: ${{ inputs.terraform-directory }}
+        shell: bash
+        env:
+          ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
+          ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
+          ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
+          azure_terraform_storage_account: ${{ inputs.azure-terraform-storage-account }}
+
+      - name: Terraform Format
+        run: terraform fmt -check
+        working-directory: ${{ inputs.terraform-directory }}
+        shell: bash

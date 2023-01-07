@@ -1,0 +1,27 @@
+name: CI - Infrastructure planning
+
+on:
+  push:
+  #pull_request:
+  #  types: [opened, synchronize, reopened]
+  #  paths:
+  #    - infrastructure/**
+  #    - .github/workflows/CD.yml
+  #    - .github/workflows/CI - Infrastructure plan.yml
+
+concurrency:
+  group: ${{ github.head_ref }}-terraform-plan
+  cancel-in-progress: true
+
+jobs:
+  terraform-plan-main:
+    name: Infrastructure plan for main environment
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CI-IaC-plan.yml@feature/start-infrastructure-ascode
+    with:
+      terraform-directory: "./infrastructure/"
+      azure-terraform-storage-account: "webapptestnikolajls"
+    secrets:
+      azure-tenant-id: ${{ secrets.azure_tenant_id }}
+      azure-subscription-id: ${{ secrets.app_main_subscription_id }}
+      azure-service-principal-id: ${{ secrets.app_main_serviceprincipal_id }}
+      azure-service-principal-secret: ${{ secrets.app_main_serviceprincipal_secret }}
