@@ -4,9 +4,13 @@ using Hellang.Middleware.ProblemDetails;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using TestProject.CQRS;
 using TestProject.Services.Math;
+using TestProject.Web.HealthCheck;
 using TestProject.Web.Infrastucture;
 using TestProject.Web.Infrastucture.Authentication;
 
@@ -28,6 +32,8 @@ namespace TestProject.Web
           AddKeyVaultIfConfigured(context, builder);
           builder.AddEnvironmentVariables();
         });
+
+        builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration));
 
 
         var services = builder.Services;
@@ -56,8 +62,17 @@ namespace TestProject.Web
         services.AddSingleton<IMathService, MathService>();
 
         services.AddProblemDetails();
+        services.AddSwaggerGen();
+
+        services.AddHealthChecks()
+       .AddCheck<KeyVaultHealthCheck>("KeyVaultConnection", tags: new[] { "KeyVault" });
+
+
+
 
         var app = builder.Build();
+
+
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
@@ -65,6 +80,11 @@ namespace TestProject.Web
           app.UseExceptionHandler("/Home/Error");
           // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
           app.UseHsts();
+        }
+        else
+        {
+          app.UseSwagger();
+          app.UseSwaggerUI();
         }
 
         app.UseProblemDetails();
@@ -81,6 +101,12 @@ namespace TestProject.Web
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
+        app.MapHealthChecks("/health");
+        app.MapHealthChecks("/health/KeyVaultConnection", new HealthCheckOptions
+        {
+          Predicate = healthCheck => healthCheck.Tags.Contains("KeyVault")
+        });
 
         app.Run();
       }
