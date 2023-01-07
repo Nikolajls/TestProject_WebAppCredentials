@@ -60,7 +60,7 @@ module "keyvault" {
 
   policies = {
     apiIdentityRead = {
-      tenant_id               = var.tenant-id
+      tenant_id               = var.tenant_id
       object_id               = azurerm_container_group.app.identity.0.principal_id
       key_permissions         = []
       secret_permissions      = var.kv-secret-permissions-read

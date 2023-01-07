@@ -7,10 +7,57 @@ on:
         description: "The directory that the terraform should be initialized from"
         required: true
         type: string
+
       azure-terraform-storage-account:
         description: "The storage account used to hold the terraform state"
         required: true
         type: string
+
+      azure-resourcegroup-name:
+        description: "Name of the resource group"
+        required: true
+        type: string
+
+      azure-location-name:
+        description: "The Azure location where all resources in this example should be created"
+        required: true
+        type: string
+
+      azure_environment:
+        description: "Environment"
+        required: true
+        type: string
+      
+      ASPNETCORE_ENVIRONMENT:
+        description: ""
+        required: true
+        type: string
+
+      Image_repo_server:
+        description: "The repository server for the docker image"
+        required: true
+        type: string
+        
+      Image_repo_user:
+        description: "The username being used to access image repo which is in Github"
+        required: true
+        type: string
+
+      Image_repo_image_path:
+        description: "The actual image path that the container should pull and spin up."
+        required: true
+        type: string
+
+      domain_name_label:
+        description: "The domain name to add to the container instance"
+        required: true
+        type: string
+
+      key_vault_name:
+        description: "The name of the keyvault being setup"
+        required: true
+        type: string
+  
     secrets:
       azure-tenant-id:
         description: "The tenant id in Azure"
@@ -23,6 +70,15 @@ on:
         required: true
       azure-service-principal-secret:
         description: "The service-principal secret"
+        required: true
+      app_authentication_username:
+        description: "The username to authenticate with in the app hosting"
+        required: true
+      app_authentication_password:
+        description: "The password to authenticate with in the app hosting"
+        required: true
+      Image_repo_user_password:
+        description: "The password being used to auth to image repo"
         required: true
 
 jobs:
@@ -52,3 +108,27 @@ jobs:
         run: terraform fmt -check
         working-directory: ${{ inputs.terraform-directory }}
         shell: bash
+
+      - id: Terraform-Plan
+        run: terraform plan
+        working-directory: ${{ inputs.terraform-directory }}
+        shell: bash
+        env:
+          ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
+          ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
+          ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
+          TF_VAR_resourceGroupName:  ${{ inputs.azure-resourcegroup-name }}
+          TF_VAR_location:  ${{ inputs.azure-location-name }}
+          TF_VAR_ASPNETCORE_ENVIRONMENT:  ${{ inputs.ASPNETCORE_ENVIRONMENT }}
+          TF_VAR_tenant_id:  ${{ secrets.azure-tenant-id }}
+          TF_VAR_Image_repo_server:  ${{ inputs.Image_repo_server }}
+          TF_VAR_Image_repo_user:  ${{ inputs.Image_repo_user }}
+          TF_VAR_Image_repo_image_path:  ${{ inputs.Image_repo_image_path }}
+          TF_VAR_domain_name_label:  ${{ inputs.domain_name_label }}
+          TF_VAR_key_vault_name: ${{ inputs.key_vault_name }}
+          TF_VAR_secret-AuthenticationInfo_username: ${{ secrets.app_authentication_username }}
+          TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
+          TF_VAR_secret_image_repo_password: ${{ secrets.Image_repo_user_password }}
+
+          

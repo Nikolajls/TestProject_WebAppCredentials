@@ -20,17 +20,17 @@ variable "ASPNETCORE_ENVIRONMENT" {
   description = "The environment that the ASPNET Core is being instructed to run in"
 }
 
-variable "Image_repo_server" {
-  default     = ""
-  description = "The repository server for the docker image"
-}
 
-variable "tenant-id" {
+variable "tenant_id" {
   default     = ""
   sensitive   = true
   description = "Tenant Id in Azure for key vault"
 }
 
+variable "Image_repo_server" {
+  default     = ""
+  description = "The repository server for the docker image"
+}
 
 variable "Image_repo_user" {
   default     = ""
