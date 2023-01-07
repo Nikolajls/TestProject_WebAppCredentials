@@ -1,7 +1,10 @@
 using Azure.Identity;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
+using TestProject.CQRS;
 using TestProject.Web.Infrastucture;
 using TestProject.Web.Infrastucture.Authentication;
 
@@ -34,6 +37,13 @@ namespace TestProject.Web
         services.Configure<BasicAuthenticationInfo>(configuration.GetSection("AuthenticationInfo"));
         services.Configure<AppConfiguration>(configuration.GetSection("AppConfiguration"));
 
+
+        //Mediatr
+        services.AddMediatR(typeof(AssemblyAnchor).Assembly);
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddValidatorsFromAssembly(typeof(AssemblyAnchor).Assembly);
+
+        //Authentcation
         services.AddAuthentication()
                   .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", options => { });
 
