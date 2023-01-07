@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 using TestProject.CQRS;
+using TestProject.Services.Math;
 using TestProject.Web.Infrastucture;
 using TestProject.Web.Infrastucture.Authentication;
 
@@ -52,7 +53,7 @@ namespace TestProject.Web
         {
           options.AddPolicy("BasicAuthentication", new AuthorizationPolicyBuilder("BasicAuthentication").RequireAuthenticatedUser().Build());
         });
-
+        services.AddSingleton<IMathService, MathService>();
 
         services.AddProblemDetails();
 

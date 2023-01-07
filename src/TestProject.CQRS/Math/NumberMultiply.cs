@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using TestProject.Services.Math;
 
 namespace TestProject.CQRS.Math;
 
@@ -15,15 +16,17 @@ public class NumberMultiply
   public class NumberMultiplyHandler : IRequestHandler<Query, double>
   {
     private readonly ILogger<NumberMultiplyHandler> _logger;
+    private readonly IMathService _mathService;
 
-    public NumberMultiplyHandler(ILogger<NumberMultiplyHandler> logger)
+    public NumberMultiplyHandler(ILogger<NumberMultiplyHandler> logger, IMathService mathService)
     {
       _logger = logger;
+      _mathService = mathService;
     }
 
     public Task<double> Handle(Query request, CancellationToken cancellationToken)
     {
-      var result = request.Number1 * request.Number2;
+      var result = _mathService.Multiply(request.Number1, request.Number2);
 
       _logger.LogInformation("Multiplying numbers {Number}*{MinusWith} resulted in: {Result}", request.Number1, request.Number2, result);
 
