@@ -120,6 +120,7 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
           TF_VAR_resourceGroupName:  ${{ inputs.azure-resourcegroup-name }}
           TF_VAR_location:  ${{ inputs.azure-location-name }}
+          TF_VAR_azure_environment:  ${{ inputs.azure_environment }}
           TF_VAR_ASPNETCORE_ENVIRONMENT:  ${{ inputs.ASPNETCORE_ENVIRONMENT }}
           TF_VAR_tenant_id:  ${{ secrets.azure-tenant-id }}
           TF_VAR_Image_repo_server:  ${{ inputs.Image_repo_server }}
