@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using TestProject.Services.Math;
 
 namespace TestProject.CQRS.Math;
 
@@ -24,15 +25,17 @@ public class NumberDivide
   public class NumberDivideHandler : IRequestHandler<Query, double>
   {
     private readonly ILogger<NumberDivideHandler> _logger;
+    private readonly IMathService _mathService;
 
-    public NumberDivideHandler(ILogger<NumberDivideHandler> logger)
+    public NumberDivideHandler(ILogger<NumberDivideHandler> logger, IMathService mathService)
     {
       _logger = logger;
+      _mathService = mathService;
     }
 
     public Task<double> Handle(Query request, CancellationToken cancellationToken)
     {
-      var result = request.Number / request.DivideBy;
+      var result = _mathService.Divide(request.Number, request.DivideBy);
 
       _logger.LogInformation("Diving numbers {Number1}/{DivideBy} resulted in: {Result}", request.Number, request.DivideBy, result);
 
