@@ -23,7 +23,11 @@ public class NumberMinus
 
     public Task<double> Handle(Query request, CancellationToken cancellationToken)
     {
-      return Task.FromResult(request.Number - request.MinusWith);
+      var result = request.Number - request.MinusWith;
+
+      _logger.LogInformation("Minusing numbers {Number}/{MinusWith} resulted in: {Result}", request.Number, request.MinusWith, result);
+
+      return Task.FromResult(result);
     }
   }
 }

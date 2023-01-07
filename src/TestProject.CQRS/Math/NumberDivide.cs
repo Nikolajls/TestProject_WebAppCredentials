@@ -32,7 +32,11 @@ public class NumberDivide
 
     public Task<double> Handle(Query request, CancellationToken cancellationToken)
     {
-      return Task.FromResult(request.Number / request.DivideBy);
+      var result = request.Number / request.DivideBy;
+
+      _logger.LogInformation("Diving numbers {Number1}/{DivideBy} resulted in: {Result}", request.Number, request.DivideBy, result);
+
+      return Task.FromResult(result);
     }
   }
 }
