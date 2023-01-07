@@ -1,10 +1,12 @@
 using Azure.Identity;
 using FluentValidation;
+using Hellang.Middleware.ProblemDetails;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 using TestProject.CQRS;
+using TestProject.Services.Math;
 using TestProject.Web.Infrastucture;
 using TestProject.Web.Infrastucture.Authentication;
 
@@ -47,11 +49,13 @@ namespace TestProject.Web
         services.AddAuthentication()
                   .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", options => { });
 
-        builder.Services.AddAuthorization(options =>
+        services.AddAuthorization(options =>
         {
           options.AddPolicy("BasicAuthentication", new AuthorizationPolicyBuilder("BasicAuthentication").RequireAuthenticatedUser().Build());
         });
+        services.AddSingleton<IMathService, MathService>();
 
+        services.AddProblemDetails();
 
         var app = builder.Build();
 
@@ -62,6 +66,10 @@ namespace TestProject.Web
           // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
           app.UseHsts();
         }
+
+        app.UseProblemDetails();
+
+
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
