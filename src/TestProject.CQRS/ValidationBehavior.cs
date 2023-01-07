@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace TestProject.CQRS;
 
@@ -8,7 +9,12 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 {
 
   private readonly IEnumerable<IValidator<TRequest>> _validators;
-  public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators) => _validators = validators;
+  private readonly ILogger<ValidationBehavior<TRequest, TResponse>> _logger;
+  public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators, ILogger<ValidationBehavior<TRequest, TResponse>> logger)
+  {
+    _validators = validators;
+    _logger = logger;
+  }
 
   public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
   {
@@ -35,8 +41,10 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
     if (listOfFailures.Count > 0)
     {
+      _logger.LogError("ValidationPipeline failed for {Type}", typeof(TRequest).Name);
       throw new ValidationException(listOfFailures);
     }
+
     return await next();
   }
 }

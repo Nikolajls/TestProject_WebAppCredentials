@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject.CQRS", "TestPro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{46956D5B-435B-43D6-BB19-C6E6540B00E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject.CQRS.Tests", "TestProject.CQRS.Tests\TestProject.CQRS.Tests.csproj", "{3522664E-62DC-4AB5-975B-B9DFC2E08AEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject.CQRS.Tests", "TestProject.CQRS.Tests\TestProject.CQRS.Tests.csproj", "{3522664E-62DC-4AB5-975B-B9DFC2E08AEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

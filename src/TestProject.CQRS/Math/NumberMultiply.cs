@@ -23,7 +23,11 @@ public class NumberMultiply
 
     public Task<double> Handle(Query request, CancellationToken cancellationToken)
     {
-      return Task.FromResult(request.Number1 * request.Number2);
+      var result = request.Number1 * request.Number2;
+
+      _logger.LogInformation("Multiplying numbers {Number}*{MinusWith} resulted in: {Result}", request.Number1, request.Number2, result);
+
+      return Task.FromResult(result);
     }
   }
 }
