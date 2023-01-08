@@ -125,29 +125,29 @@ jobs:
         working-directory: ${{ inputs.terraform-directory }}
         shell: bash
 
-      #- id: Terraform-Apply
-      #  run: terraform apply -auto-approve
-      #  working-directory: ${{ inputs.terraform-directory }}
-      #  shell: bash
-      #  env:
-      #    ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
-      #    ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
-      #    ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
-      #    ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
-      #    TF_VAR_resourceGroupName:  ${{ inputs.azure-resourcegroup-name }}
-      #    TF_VAR_location:  ${{ inputs.azure-location-name }}
-      #    TF_VAR_azure_environment:  ${{ inputs.azure_environment }}
-      #    TF_VAR_ASPNETCORE_ENVIRONMENT:  ${{ inputs.ASPNETCORE_ENVIRONMENT }}
-      #    TF_VAR_tenant_id:  ${{ secrets.azure-tenant-id }}
-      #    TF_VAR_Image_repo_server:  ${{ inputs.Image_repo_server }}
-      #    TF_VAR_Image_repo_user:  ${{ inputs.Image_repo_user }}
-      #    TF_VAR_Image_repo_image_path:  ${{ inputs.Image_repo_image_path }}
-      #    TF_VAR_domain_name_label:  ${{ inputs.domain_name_label }}
-      #    TF_VAR_container_name:  ${{ inputs.container_name }}
-      #    TF_VAR_key_vault_name: ${{ inputs.key_vault_name }}
-      #    TF_VAR_secret-AuthenticationInfo_username: ${{ secrets.app_authentication_username }}
-      #    TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
-      #    TF_VAR_secret_image_repo_password: ${{ secrets.Image_repo_user_password }}
+      - id: Terraform-Apply
+        run: terraform apply -auto-approve
+        working-directory: ${{ inputs.terraform-directory }}
+        shell: bash
+        env:
+          ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
+          ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
+          ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
+          TF_VAR_resourceGroupName:  ${{ inputs.azure-resourcegroup-name }}
+          TF_VAR_location:  ${{ inputs.azure-location-name }}
+          TF_VAR_azure_environment:  ${{ inputs.azure_environment }}
+          TF_VAR_ASPNETCORE_ENVIRONMENT:  ${{ inputs.ASPNETCORE_ENVIRONMENT }}
+          TF_VAR_tenant_id:  ${{ secrets.azure-tenant-id }}
+          TF_VAR_Image_repo_server:  ${{ inputs.Image_repo_server }}
+          TF_VAR_Image_repo_user:  ${{ inputs.Image_repo_user }}
+          TF_VAR_Image_repo_image_path:  ${{ inputs.Image_repo_image_path }}
+          TF_VAR_domain_name_label:  ${{ inputs.domain_name_label }}
+          TF_VAR_container_name:  ${{ inputs.container_name }}
+          TF_VAR_key_vault_name: ${{ inputs.key_vault_name }}
+          TF_VAR_secret-AuthenticationInfo_username: ${{ secrets.app_authentication_username }}
+          TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
+          TF_VAR_secret_image_repo_password: ${{ secrets.Image_repo_user_password }}
 
 
       - id: set-outputs

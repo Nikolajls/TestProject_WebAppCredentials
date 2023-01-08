@@ -112,19 +112,6 @@ jobs:
       app_authentication_password: ${{ secrets.app_authentication_password }}
       Image_repo_user_password: ${{ secrets.Image_repo_user_password }}
 
-   test-output-containerid:
-    name: Testoutput
-    runs-on: ubuntu-latest
-    needs: infrastructure-apply
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: "Output resource group"
-        run: echo ${{ needs.infrastructure-apply.outputs.resourceGroup }}
-
-      - name: "Output container name"
-        run: echo ${{ needs.infrastructure-apply.outputs.containerName }}
-
    trigger-container-restart:
     name: Restart container
     uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-Container-Restart.yml@feature/update_CD_workflow_include_infrastructure
