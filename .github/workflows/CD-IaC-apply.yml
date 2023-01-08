@@ -1,0 +1,157 @@
+name: CD - IaC apply
+
+on:
+  workflow_call:
+    inputs:
+      terraform-directory:
+        description: "The directory that the terraform should be initialized from"
+        required: true
+        type: string
+
+      azure-terraform-storage-account:
+        description: "The storage account used to hold the terraform state"
+        required: true
+        type: string
+
+      azure-resourcegroup-name:
+        description: "Name of the resource group"
+        required: true
+        type: string
+
+      azure-location-name:
+        description: "The Azure location where all resources in this example should be created"
+        required: true
+        type: string
+
+      azure_environment:
+        description: "Environment"
+        required: true
+        type: string
+      
+      ASPNETCORE_ENVIRONMENT:
+        description: ""
+        required: true
+        type: string
+
+      Image_repo_server:
+        description: "The repository server for the docker image"
+        required: true
+        type: string
+        
+      Image_repo_user:
+        description: "The username being used to access image repo which is in Github"
+        required: true
+        type: string
+
+      Image_repo_image_path:
+        description: "The actual image path that the container should pull and spin up."
+        required: true
+        type: string
+
+      domain_name_label:
+        description: "The domain name to add to the container instance"
+        required: true
+        type: string
+
+      key_vault_name:
+        description: "The name of the keyvault being setup"
+        required: true
+        type: string
+  
+    secrets:
+      azure-tenant-id:
+        description: "The tenant id in Azure"
+        required: true
+      azure-subscription-id:
+        description: "The subscription id in Azure"
+        required: true
+      azure-service-principal-id:
+        description: "The service-principal id"
+        required: true
+      azure-service-principal-secret:
+        description: "The service-principal secret"
+        required: true
+      app_authentication_username:
+        description: "The username to authenticate with in the app hosting"
+        required: true
+      app_authentication_password:
+        description: "The password to authenticate with in the app hosting"
+        required: true
+      Image_repo_user_password:
+        description: "The password being used to auth to image repo"
+        required: true
+    outputs:
+      containerResourceId:
+        description: "The id of the container instance"
+        value: ${{ jobs.restart-api.outputs.containerResourceId }}
+
+
+jobs:
+  restart-api:
+    runs-on: ubuntu-latest
+    name: Plan infrastructure
+    outputs:
+      containerResourceId: ${{ steps.set-outputs.outputs.containerResourceId }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init --backend-config="storage_account_name=$azure_terraform_storage_account"
+        working-directory: ${{ inputs.terraform-directory }}
+        shell: bash
+        env:
+          ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
+          ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
+          ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
+          azure_terraform_storage_account: ${{ inputs.azure-terraform-storage-account }}
+
+      - name: Terraform Format
+        run: terraform fmt -check
+        working-directory: ${{ inputs.terraform-directory }}
+        shell: bash
+
+      #- id: Terraform-Apply
+      #  run: terraform apply -auto-approve
+      #  working-directory: ${{ inputs.terraform-directory }}
+      #  shell: bash
+      #  env:
+      #    ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
+      #    ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
+      #    ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
+      #    ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
+      #    TF_VAR_resourceGroupName:  ${{ inputs.azure-resourcegroup-name }}
+      #    TF_VAR_location:  ${{ inputs.azure-location-name }}
+      #    TF_VAR_azure_environment:  ${{ inputs.azure_environment }}
+      #    TF_VAR_ASPNETCORE_ENVIRONMENT:  ${{ inputs.ASPNETCORE_ENVIRONMENT }}
+      #    TF_VAR_tenant_id:  ${{ secrets.azure-tenant-id }}
+      #    TF_VAR_Image_repo_server:  ${{ inputs.Image_repo_server }}
+      #    TF_VAR_Image_repo_user:  ${{ inputs.Image_repo_user }}
+      #    TF_VAR_Image_repo_image_path:  ${{ inputs.Image_repo_image_path }}
+      #    TF_VAR_domain_name_label:  ${{ inputs.domain_name_label }}
+      #    TF_VAR_key_vault_name: ${{ inputs.key_vault_name }}
+      #    TF_VAR_secret-AuthenticationInfo_username: ${{ secrets.app_authentication_username }}
+      #    TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
+      #    TF_VAR_secret_image_repo_password: ${{ secrets.Image_repo_user_password }}
+#
+      - id: set-outputs
+        working-directory: ${{ inputs.terraform-directory }}
+        run: |
+          containerResourceId=$(terraform output -raw containerResourceId)
+          echo "::set-output name=containerResourceId::$containerResourceId"
+        shell: bash
+        env:
+          ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
+          ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
+          ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
+    
+      - id: get-outputs
+        shell: bash
+        run: |
+          echo ${{ steps.set-outputs.outputs.containerResourceId }}

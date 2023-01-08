@@ -1,0 +1,120 @@
+name: CD - Start deployment
+
+on:
+  workflow_call:
+    inputs:
+      terraform-directory:
+        description: "The directory that the terraform should be initialized from"
+        required: true
+        type: string
+
+      azure-terraform-storage-account:
+        description: "The storage account used to hold the terraform state"
+        required: true
+        type: string
+
+      azure-resourcegroup-name:
+        description: "Name of the resource group"
+        required: true
+        type: string
+
+      azure-location-name:
+        description: "The Azure location where all resources in this example should be created"
+        required: true
+        type: string
+
+      azure_environment:
+        description: "Environment"
+        required: true
+        type: string
+      
+      ASPNETCORE_ENVIRONMENT:
+        description: ""
+        required: true
+        type: string
+
+      Image_repo_server:
+        description: "The repository server for the docker image"
+        required: true
+        type: string
+        
+      Image_repo_user:
+        description: "The username being used to access image repo which is in Github"
+        required: true
+        type: string
+
+      Image_repo_image_path:
+        description: "The actual image path that the container should pull and spin up."
+        required: true
+        type: string
+
+      domain_name_label:
+        description: "The domain name to add to the container instance"
+        required: true
+        type: string
+
+      key_vault_name:
+        description: "The name of the keyvault being setup"
+        required: true
+        type: string
+  
+    secrets:
+      azure-tenant-id:
+        description: "The tenant id in Azure"
+        required: true
+      azure-subscription-id:
+        description: "The subscription id in Azure"
+        required: true
+      azure-service-principal-id:
+        description: "The service-principal id"
+        required: true
+      azure-service-principal-secret:
+        description: "The service-principal secret"
+        required: true
+      app_authentication_username:
+        description: "The username to authenticate with in the app hosting"
+        required: true
+      app_authentication_password:
+        description: "The password to authenticate with in the app hosting"
+        required: true
+      Image_repo_user_password:
+        description: "The password being used to auth to image repo"
+        required: true
+    
+jobs:
+   infrastructure-apply:
+    name: Infrastructure apply
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-IaC-apply.yml@feature/update_CD_workflow_include_infrastructure
+    with:
+      terraform-directory: ${{ inputs.terraform }}
+      azure-terraform-storage-account: ${{ inputs.azure-terraform-storage-account }}
+      azure-resourcegroup-name: ${{ inputs.azure-resourcegroup-name }}
+      azure-location-name: ${{ inputs.azure-location-name }}
+      azure_environment: ${{ inputs.azure_environment }}
+      ASPNETCORE_ENVIRONMENT: ${{ inputs.ASPNETCORE_ENVIRONMENT }}
+      Image_repo_server: ${{ inputs.Image_repo_server }}
+      Image_repo_user: ${{ inputs.Image_repo_user }}
+      Image_repo_image_path: ${{ inputs.Image_repo_image_path }}
+      domain_name_label: ${{ inputs.domain_name_label }}
+      key_vault_name: ${{ inputs.key_vault_name }}
+    secrets:
+      azure-tenant-id: ${{ secrets.azure-tenant-id }}
+      azure-subscription-id: ${{ secrets.azure-subscription-id }}
+      azure-service-principal-id: ${{ secrets.azure-service-principal-id }}
+      azure-service-principal-secret: ${{ secrets.azure-service-principal-secret }}
+      app_authentication_username: ${{ secrets.app_authentication_username }}
+      app_authentication_password: ${{ secrets.app_authentication_password }}
+      Image_repo_user_password: ${{ secrets.Image_repo_user_password }}
+
+   trigger-container-restart:
+    name: Restart container
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-Container-Restart.yml@feature/update_CD_workflow_include_infrastructure
+    needs: infrastructure-apply
+    with:
+      containerResourceId: ${{ needs.infrastructure-apply.outputs.containerResourceId }}
+   
+    secrets:
+      azure-tenant-id: ${{ secrets.azure-tenant-id }}
+      azure-subscription-id: ${{ secrets.azure-subscription-id }}
+      azure-service-principal-id: ${{ secrets.azure-service-principal-id }}
+      azure-service-principal-secret: ${{ secrets.azure-service-principal-secret }}
