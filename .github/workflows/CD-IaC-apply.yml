@@ -83,13 +83,13 @@ on:
     outputs:
       containerResourceId:
         description: "The id of the container instance"
-        value: ${{ jobs.restart-api.outputs.containerResourceId }}
+        value: ${{ jobs.apply.outputs.containerResourceId }}
 
 
 jobs:
-  restart-api:
+  apply:
     runs-on: ubuntu-latest
-    name: Plan infrastructure
+    name: Apply infrastructure
     outputs:
       containerResourceId: ${{ steps.set-outputs.outputs.containerResourceId }}
     steps:
@@ -138,11 +138,11 @@ jobs:
       #    TF_VAR_secret-AuthenticationInfo_username: ${{ secrets.app_authentication_username }}
       #    TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
       #    TF_VAR_secret_image_repo_password: ${{ secrets.Image_repo_user_password }}
-#
+# containerResourceId=$(terraform output -raw containerResourceId)
       - id: set-outputs
         working-directory: ${{ inputs.terraform-directory }}
         run: |
-          containerResourceId=$(terraform output -raw containerResourceId)
+          containerResourceId=$(terraform output -raw containerResourceId | base64)
           echo "::set-output name=containerResourceId::$containerResourceId"
         shell: bash
         env:
