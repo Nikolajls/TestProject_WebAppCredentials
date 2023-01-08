@@ -81,7 +81,7 @@ module "keyvault" {
 resource "azurerm_container_group" "app" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  name                = "webapptest"
+  name                = var.container_name
   dns_name_label      = var.domain_name_label
   ip_address_type     = "Public"
 

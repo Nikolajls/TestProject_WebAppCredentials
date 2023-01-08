@@ -52,6 +52,11 @@ on:
         description: "The domain name to add to the container instance"
         required: true
         type: string
+ 
+      container_name:
+        description: "The  name to of the container instance"
+        required: true
+        type: string
 
       key_vault_name:
         description: "The name of the keyvault being setup"
@@ -80,18 +85,22 @@ on:
       Image_repo_user_password:
         description: "The password being used to auth to image repo"
         required: true
+    
     outputs:
-      containerResourceId:
-        description: "The id of the container instance"
-        value: ${{ jobs.apply.outputs.containerResourceId }}
-
+      resourceGroup:
+        description: "The name of the resource group"
+        value: ${{ jobs.apply.outputs.resourceGroup }}
+      containerName:
+        description: "The name of the container instance"
+        value: ${{ jobs.apply.outputs.containerName }}
 
 jobs:
   apply:
     runs-on: ubuntu-latest
     name: Apply infrastructure
     outputs:
-      containerResourceId: ${{ steps.set-outputs.outputs.containerResourceId }}
+      resourceGroup: ${{ steps.set-outputs.outputs.resourceGroup }}
+      containerName: ${{ steps.set-outputs.outputs.containerName }}
     steps:
       - uses: actions/checkout@v3
 
@@ -134,16 +143,20 @@ jobs:
       #    TF_VAR_Image_repo_user:  ${{ inputs.Image_repo_user }}
       #    TF_VAR_Image_repo_image_path:  ${{ inputs.Image_repo_image_path }}
       #    TF_VAR_domain_name_label:  ${{ inputs.domain_name_label }}
+      #    TF_VAR_container_name:  ${{ inputs.container_name }}
       #    TF_VAR_key_vault_name: ${{ inputs.key_vault_name }}
       #    TF_VAR_secret-AuthenticationInfo_username: ${{ secrets.app_authentication_username }}
       #    TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
       #    TF_VAR_secret_image_repo_password: ${{ secrets.Image_repo_user_password }}
-# containerResourceId=$(terraform output -raw containerResourceId)
+
+
       - id: set-outputs
         working-directory: ${{ inputs.terraform-directory }}
         run: |
-          containerResourceId=$(terraform output -raw containerResourceId | base64)
-          echo "::set-output name=containerResourceId::$containerResourceId"
+          resourceGroup=$(terraform output -raw resourceGroup)
+          containerName=$(terraform output -raw containerName)
+          echo "::set-output name=resourceGroup::$resourceGroup"
+          echo "::set-output name=containerName::$containerName"
         shell: bash
         env:
           ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
@@ -154,4 +167,5 @@ jobs:
       - id: get-outputs
         shell: bash
         run: |
-          echo ${{ steps.set-outputs.outputs.containerResourceId }}
+          echo ${{ steps.set-outputs.outputs.resourceGroup }}
+          echo ${{ steps.set-outputs.outputs.containerName }}

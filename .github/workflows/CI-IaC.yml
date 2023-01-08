@@ -27,6 +27,7 @@ jobs:
       Image_repo_user: "USERNAME"
       Image_repo_image_path: "ghcr.io/nikolajls/testproject_webappcredentials:main"
       domain_name_label: "nikolajwebapptest"
+      container_name: "webapptest"
       key_vault_name: "nikolajvaf13"
     secrets:
       azure-tenant-id: ${{ secrets.azure_tenant_id }}

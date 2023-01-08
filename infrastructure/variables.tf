@@ -48,5 +48,10 @@ variable "domain_name_label" {
   description = "The domainname to add to the container instance"
 }
 
+variable "container_name" {
+  default     = ""
+  description = "The name of the container instance"
+}
+
 
 

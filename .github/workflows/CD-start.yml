@@ -53,6 +53,11 @@ on:
         required: true
         type: string
 
+      container_name:
+        description: "The  name to of the container instance"
+        required: true
+        type: string
+
       key_vault_name:
         description: "The name of the keyvault being setup"
         required: true
@@ -96,6 +101,7 @@ jobs:
       Image_repo_user: ${{ inputs.Image_repo_user }}
       Image_repo_image_path: ${{ inputs.Image_repo_image_path }}
       domain_name_label: ${{ inputs.domain_name_label }}
+      container_name: ${{ inputs.container_name }}
       key_vault_name: ${{ inputs.key_vault_name }}
     secrets:
       azure-tenant-id: ${{ secrets.azure-tenant-id }}
@@ -113,8 +119,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: "Output containerresourceid"
-        run: echo ${{ needs.infrastructure-apply.outputs.containerResourceId }}
+      - name: "Output resource group"
+        run: echo ${{ needs.infrastructure-apply.outputs.resourceGroup }}
+
+      - name: "Output container name"
+        run: echo ${{ needs.infrastructure-apply.outputs.containerName }}
 
    #trigger-container-restart:
    # name: Restart container

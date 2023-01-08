@@ -53,6 +53,11 @@ on:
         required: true
         type: string
 
+      container_name:
+        description: "The  name to of the container instance"
+        required: true
+        type: string
+
       key_vault_name:
         description: "The name of the keyvault being setup"
         required: true
@@ -127,6 +132,7 @@ jobs:
           TF_VAR_Image_repo_user:  ${{ inputs.Image_repo_user }}
           TF_VAR_Image_repo_image_path:  ${{ inputs.Image_repo_image_path }}
           TF_VAR_domain_name_label:  ${{ inputs.domain_name_label }}
+          TF_VAR_container_name:  ${{ inputs.container_name }}
           TF_VAR_key_vault_name: ${{ inputs.key_vault_name }}
           TF_VAR_secret-AuthenticationInfo_username: ${{ secrets.app_authentication_username }}
           TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
