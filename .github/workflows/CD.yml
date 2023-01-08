@@ -42,3 +42,29 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  deploy-main-environment:
+    name: Deploy main branch
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-start.yml@main
+    with:
+      terraform-directory: "./infrastructure/"
+      azure-terraform-storage-account: "webapptestnikolajls"
+      azure-resourcegroup-name: "TestWebApp"
+      azure-location-name: "westeurope"
+      azure_environment: "Development"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      Image_repo_server: "ghcr.io"
+      Image_repo_user: "USERNAME"
+      Image_repo_image_path: "ghcr.io/nikolajls/testproject_webappcredentials:main"
+      domain_name_label: "nikolajwebapptest"
+      container_name: "webapptest"
+      key_vault_name: "nikolajvaf13"
+    secrets:
+      azure-tenant-id: ${{ secrets.azure_tenant_id }}
+      azure-subscription-id: ${{ secrets.app_main_subscription_id }}
+      azure-service-principal-id: ${{ secrets.app_main_serviceprincipal_id }}
+      azure-service-principal-secret: ${{ secrets.app_main_serviceprincipal_secret }}
+      app_authentication_username: ${{ secrets.app_main_username }}
+      app_authentication_password: ${{ secrets.app_main_password }}
+      Image_repo_user_password: ${{ secrets.app_main_dockerimage_PAT }}
