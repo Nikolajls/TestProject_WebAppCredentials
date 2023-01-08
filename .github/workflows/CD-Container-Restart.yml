@@ -1,0 +1,47 @@
+name: CD - Restart Container
+
+on:
+  workflow_call:
+    inputs: 
+      resourceGroup:
+        description: "The name of the resource group"
+        required: true
+        type: string
+      containerName:
+        description: "The name of the container instance"
+        required: true
+        type: string
+    secrets:
+      azure-tenant-id:
+        description: "The tenant id in Azure"
+        required: true
+      azure-subscription-id:
+        description: "The subscription id in Azure"
+        required: true
+      azure-service-principal-id:
+        description: "The service-principal id"
+        required: true
+      azure-service-principal-secret:
+        description: "The service-principal secret"
+        required: true
+jobs:
+  restart-api:
+    runs-on: ubuntu-latest
+    name: Restart container group instance
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: Azure/login@v1
+        with:
+          creds: '{"clientId":"${{ secrets.azure-service-principal-id }}","clientSecret":"${{ secrets.azure-service-principal-secret }}","subscriptionId":"${{ secrets.azure-subscription-id }}","tenantId":"${{ secrets.azure-tenant-id }}"}'
+      
+      - name: "Output inputs"
+        run: | 
+          echo ${{ inputs.resourceGroup }}
+          echo ${{ inputs.containerName }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+         inlineScript: |
+           az container restart --name ${{ inputs.containerName }} --resource-group ${{ inputs.resourceGroup }} 

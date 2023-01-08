@@ -1,4 +1,4 @@
-name: Terraform infrastructure plan
+name: CD - IaC apply
 
 on:
   workflow_call:
@@ -52,7 +52,7 @@ on:
         description: "The domain name to add to the container instance"
         required: true
         type: string
-
+ 
       container_name:
         description: "The  name to of the container instance"
         required: true
@@ -85,11 +85,22 @@ on:
       Image_repo_user_password:
         description: "The password being used to auth to image repo"
         required: true
+    
+    outputs:
+      resourceGroup:
+        description: "The name of the resource group"
+        value: ${{ jobs.apply.outputs.resourceGroup }}
+      containerName:
+        description: "The name of the container instance"
+        value: ${{ jobs.apply.outputs.containerName }}
 
 jobs:
-  restart-api:
+  apply:
     runs-on: ubuntu-latest
-    name: Plan infrastructure
+    name: Apply infrastructure
+    outputs:
+      resourceGroup: ${{ steps.set-outputs.outputs.resourceGroup }}
+      containerName: ${{ steps.set-outputs.outputs.containerName }}
     steps:
       - uses: actions/checkout@v3
 
@@ -114,8 +125,8 @@ jobs:
         working-directory: ${{ inputs.terraform-directory }}
         shell: bash
 
-      - id: Terraform-Plan
-        run: terraform plan
+      - id: Terraform-Apply
+        run: terraform apply -auto-approve
         working-directory: ${{ inputs.terraform-directory }}
         shell: bash
         env:
@@ -138,4 +149,23 @@ jobs:
           TF_VAR_secret-AuthenticationInfo_password: ${{ secrets.app_authentication_password }}
           TF_VAR_secret_image_repo_password: ${{ secrets.Image_repo_user_password }}
 
-          
+
+      - id: set-outputs
+        working-directory: ${{ inputs.terraform-directory }}
+        run: |
+          resourceGroup=$(terraform output -raw resourceGroup)
+          containerName=$(terraform output -raw containerName)
+          echo "::set-output name=resourceGroup::$resourceGroup"
+          echo "::set-output name=containerName::$containerName"
+        shell: bash
+        env:
+          ARM_TENANT_ID: ${{ secrets.azure-tenant-id }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.azure-subscription-id }}
+          ARM_CLIENT_ID: ${{ secrets.azure-service-principal-id }}
+          ARM_CLIENT_SECRET: ${{ secrets.azure-service-principal-secret }}
+    
+      - id: get-outputs
+        shell: bash
+        run: |
+          echo ${{ steps.set-outputs.outputs.resourceGroup }}
+          echo ${{ steps.set-outputs.outputs.containerName }}
