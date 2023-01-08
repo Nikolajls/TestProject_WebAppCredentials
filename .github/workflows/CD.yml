@@ -46,7 +46,7 @@ jobs:
     name: Deploy main branch
     if: github.ref == 'refs/heads/main'
     needs: build
-    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-start.yml@main
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-start.yml@feature/update_CD_workflow_include_infrastructure
     with:
       terraform-directory: "./infrastructure/"
       azure-terraform-storage-account: "webapptestnikolajls"

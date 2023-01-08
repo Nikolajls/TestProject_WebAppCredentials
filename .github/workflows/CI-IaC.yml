@@ -15,7 +15,7 @@ concurrency:
 jobs:
   terraform-plan-main:
     name: Infrastructure plan for main environment
-    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CI-IaC-plan.yml@main
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CI-IaC-plan.yml@feature/update_CD_workflow_include_infrastructure
     with:
       terraform-directory: "./infrastructure/"
       azure-terraform-storage-account: "webapptestnikolajls"
