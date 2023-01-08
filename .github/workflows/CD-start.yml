@@ -86,7 +86,7 @@ jobs:
     name: Infrastructure apply
     uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-IaC-apply.yml@feature/update_CD_workflow_include_infrastructure
     with:
-      terraform-directory: ${{ inputs.terraform }}
+      terraform-directory: ${{ inputs.terraform-directory }}
       azure-terraform-storage-account: ${{ inputs.azure-terraform-storage-account }}
       azure-resourcegroup-name: ${{ inputs.azure-resourcegroup-name }}
       azure-location-name: ${{ inputs.azure-location-name }}
