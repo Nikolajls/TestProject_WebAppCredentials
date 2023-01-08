@@ -89,7 +89,7 @@ on:
 jobs:
    infrastructure-apply:
     name: Infrastructure apply
-    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-IaC-apply.yml@feature/update_CD_workflow_include_infrastructure
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-IaC-apply.yml@main
     with:
       terraform-directory: ${{ inputs.terraform-directory }}
       azure-terraform-storage-account: ${{ inputs.azure-terraform-storage-account }}
@@ -114,7 +114,7 @@ jobs:
 
    trigger-container-restart:
     name: Restart container
-    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-Container-Restart.yml@feature/update_CD_workflow_include_infrastructure
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-Container-Restart.yml@main
     needs: infrastructure-apply
     with:
       resourceGroup: ${{ needs.infrastructure-apply.outputs.resourceGroup }}
