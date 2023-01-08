@@ -125,15 +125,16 @@ jobs:
       - name: "Output container name"
         run: echo ${{ needs.infrastructure-apply.outputs.containerName }}
 
-   #trigger-container-restart:
-   # name: Restart container
-   # uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-Container-Restart.yml@feature/update_CD_workflow_include_infrastructure
-   # needs: infrastructure-apply
-   # with:
-   #   containerResourceId: ${{ needs.infrastructure-apply.outputs.containerResourceId }}
-   #
-   # secrets:
-   #   azure-tenant-id: ${{ secrets.azure-tenant-id }}
-   #   azure-subscription-id: ${{ secrets.azure-subscription-id }}
-   #   azure-service-principal-id: ${{ secrets.azure-service-principal-id }}
-   #   azure-service-principal-secret: ${{ secrets.azure-service-principal-secret }}
+   trigger-container-restart:
+    name: Restart container
+    uses: Nikolajls/TestProject_WebAppCredentials/.github/workflows/CD-Container-Restart.yml@feature/update_CD_workflow_include_infrastructure
+    needs: infrastructure-apply
+    with:
+      resourceGroup: ${{ needs.infrastructure-apply.outputs.resourceGroup }}
+      containerName: ${{ needs.infrastructure-apply.outputs.containerName }}
+   
+    secrets:
+      azure-tenant-id: ${{ secrets.azure-tenant-id }}
+      azure-subscription-id: ${{ secrets.azure-subscription-id }}
+      azure-service-principal-id: ${{ secrets.azure-service-principal-id }}
+      azure-service-principal-secret: ${{ secrets.azure-service-principal-secret }}

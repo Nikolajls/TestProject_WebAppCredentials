@@ -3,8 +3,12 @@ name: CD - Restart Container
 on:
   workflow_call:
     inputs: 
-      containerResourceId:
-        description: Id of the container group instance to trigger restart off 
+      resourceGroup:
+        description: "The name of the resource group"
+        required: true
+        type: string
+      containerName:
+        description: "The name of the container instance"
         required: true
         type: string
     secrets:
@@ -31,11 +35,13 @@ jobs:
         with:
           creds: '{"clientId":"${{ secrets.azure-service-principal-id }}","clientSecret":"${{ secrets.azure-service-principal-secret }}","subscriptionId":"${{ secrets.azure-subscription-id }}","tenantId":"${{ secrets.azure-tenant-id }}"}'
       
-      - name: "Output containerresourceid"
-        run: echo ${{ inputs.containerResourceId }}
+      - name: "Output inputs"
+        run: | 
+          echo ${{ inputs.resourceGroup }}
+          echo ${{ inputs.containerName }}
 
-      #- name: Azure CLI script
-      #  uses: azure/CLI@v1
-      #  with:
-      #    inlineScript: |
-      #      az webapp restart --ids ${{ inputs.containerResourceId }}
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+         inlineScript: |
+           az container restart --name ${{ inputs.containerName }} --resource-group ${{ inputs.resourceGroup }} 
