@@ -1,13 +1,12 @@
 name: CI - Infrastructure planning
 
 on:
-  push:
-  #pull_request:
-  #  types: [opened, synchronize, reopened]
-  #  paths:
-  #    - infrastructure/**
-  #    - .github/workflows/CD.yml
-  #    - .github/workflows/CI - Infrastructure plan.yml
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - infrastructure/**
+      - .github/workflows/CI-IaC-plan.yml
+      - .github/workflows/CI-IaC.yml
 
 concurrency:
   group: ${{ github.head_ref }}-terraform-plan
